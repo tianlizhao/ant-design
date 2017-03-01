@@ -89,6 +89,8 @@ export default class Menu extends React.Component<MenuProps, any> {
     }
     if ('openKeys' in nextProps) {
       this.setState({ openKeys: nextProps.openKeys });
+    } else {
+      this.setState({ openKeys: [] });
     }
   }
   handleClick = (e) => {
