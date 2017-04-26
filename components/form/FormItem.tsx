@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import PureRenderMixin from 'rc-util/lib/PureRenderMixin';
 import Row from '../row';
@@ -41,22 +42,22 @@ export default class FormItem extends React.Component<FormItemProps, any> {
   };
 
   static propTypes = {
-    prefixCls: React.PropTypes.string,
-    label: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.node]),
-    labelCol: React.PropTypes.object,
-    help: React.PropTypes.oneOfType([React.PropTypes.node, React.PropTypes.bool]),
-    validateStatus: React.PropTypes.oneOf(['', 'success', 'warning', 'error', 'validating']),
-    hasFeedback: React.PropTypes.bool,
-    wrapperCol: React.PropTypes.object,
-    className: React.PropTypes.string,
-    id: React.PropTypes.string,
-    children: React.PropTypes.node,
-    colon: React.PropTypes.bool,
+    prefixCls: PropTypes.string,
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    labelCol: PropTypes.object,
+    help: PropTypes.oneOfType([PropTypes.node, PropTypes.bool]),
+    validateStatus: PropTypes.oneOf(['', 'success', 'warning', 'error', 'validating']),
+    hasFeedback: PropTypes.bool,
+    wrapperCol: PropTypes.object,
+    className: PropTypes.string,
+    id: PropTypes.string,
+    children: PropTypes.node,
+    colon: PropTypes.bool,
   };
 
   static contextTypes = {
-    form: React.PropTypes.object,
-    vertical: React.PropTypes.bool,
+    form: PropTypes.object,
+    vertical: PropTypes.bool,
   };
 
   context: FormItemContext;
@@ -65,7 +66,7 @@ export default class FormItem extends React.Component<FormItemProps, any> {
     warning(
       this.getControls(this.props.children, true).length <= 1,
       '`Form.Item` cannot generate `validateStatus` and `help` automatically, ' +
-      'while there are more than one `getFieldDecorator` in it.'
+      'while there are more than one `getFieldDecorator` in it.',
     );
   }
 
@@ -177,7 +178,7 @@ export default class FormItem extends React.Component<FormItemProps, any> {
           'has-warning': validateStatus === 'warning',
           'has-error': validateStatus === 'error',
           'is-validating': validateStatus === 'validating',
-        }
+        },
       );
     }
     return (
@@ -256,8 +257,8 @@ export default class FormItem extends React.Component<FormItemProps, any> {
         this.renderValidateWrapper(
           children,
           this.renderHelp(),
-          this.renderExtra()
-        )
+          this.renderExtra(),
+        ),
       ),
     ];
   }

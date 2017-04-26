@@ -7,7 +7,7 @@ Ant Design React 致力于提供给程序员**愉悦**的开发体验。
 
 ---
 
-在开始之前，推荐先学习 [React](http://facebook.github.io/react/) 和 [ES2015](http://babeljs.io/docs/learn-es2015/)，并确认 已经正确安装和配置了 [Node.js](https://nodejs.org/) v4.x 或以上。
+在开始之前，推荐先学习 [React](http://facebook.github.io/react/) 和 [ES2015](http://babeljs.io/docs/learn-es2015/)，并正确安装和配置了 [Node.js](https://nodejs.org/) v4.x 或以上。
 
 ## 第一个例子
 
@@ -32,6 +32,7 @@ $ npm install antd-init -g
 
 > 除了官方提供的脚手架，您也可以使用社区提供的脚手架和范例：
 >
+>   - [antd-admin](https://github.com/zuiidea/antd-admin)
 >   - [reactSPA](https://github.com/JasonBai007/reactSPA)
 >   - [react-redux-antd by Justin-lu](https://github.com/Justin-lu/react-redux-antd)
 >   - [react-redux-antd by okoala](https://github.com/okoala/react-redux-antd)
@@ -158,9 +159,13 @@ IE8 需要配合使用 [react@0.14.x](https://facebook.github.io/react/blog/2016
 
 ## 按需加载
 
-如果你在控制台看到下面的提示，则你可能使用了 `import { Button } from 'antd';` 的写法引入了 antd 下所有的模块，这会影响应用的网络性能。
+如果你在开发环境的控制台看到下面的提示，那么你可能使用了 `import { Button } from 'antd';` 的写法引入了 antd 下所有的模块，这会影响应用的网络性能。
 
-> ![](https://zos.alipayobjects.com/rmsportal/vgcHJRVZFmPjAawwVoXK.png)
+```
+You are using a whole package of antd, please use https://www.npmjs.com/package/babel-plugin-import to reduce app bundle size.
+```
+
+> ![](https://zos.alipayobjects.com/rmsportal/GHIRszVcmjccgZRakJDQ.png)
 
 可以通过以下的写法来按需加载组件。
 

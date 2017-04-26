@@ -1,6 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { findDOMNode } from 'react-dom';
 import Icon from '../icon';
 import omit from 'omit.js';
 
@@ -12,6 +12,10 @@ function isString(str) {
 
 // Insert one space between two chinese characters automatically.
 function insertSpace(child) {
+  // Check the child if is undefined or null.
+  if (child == null) {
+    return;
+  }
   if (isString(child.type) && isTwoCNChar(child.props.children)) {
     return React.cloneElement(child, {},
                               child.props.children.split('').join(' '));
@@ -25,9 +29,9 @@ function insertSpace(child) {
   return child;
 }
 
-export type ButtonType = 'primary' | 'ghost' | 'dashed' | 'danger'
-export type ButtonShape = 'circle' | 'circle-outline'
-export type ButtonSize = 'small' | 'large'
+export type ButtonType = 'primary' | 'ghost' | 'dashed' | 'danger';
+export type ButtonShape = 'circle' | 'circle-outline';
+export type ButtonSize = 'small' | 'large';
 
 export interface ButtonProps {
   type?: ButtonType;
@@ -37,7 +41,7 @@ export interface ButtonProps {
   size?: ButtonSize;
   onClick?: React.FormEventHandler<any>;
   onMouseUp?: React.FormEventHandler<any>;
-  loading?: boolean;
+  loading?: boolean | { delay?: number };
   disabled?: boolean;
   style?: React.CSSProperties;
   prefixCls?: string;
@@ -57,14 +61,14 @@ export default class Button extends React.Component<ButtonProps, any> {
   };
 
   static propTypes = {
-    type: React.PropTypes.string,
-    shape: React.PropTypes.oneOf(['circle', 'circle-outline']),
-    size: React.PropTypes.oneOf(['large', 'default', 'small']),
-    htmlType: React.PropTypes.oneOf(['submit', 'button', 'reset']),
-    onClick: React.PropTypes.func,
-    loading: React.PropTypes.bool,
-    className: React.PropTypes.string,
-    icon: React.PropTypes.string,
+    type: PropTypes.string,
+    shape: PropTypes.oneOf(['circle', 'circle-outline']),
+    size: PropTypes.oneOf(['large', 'default', 'small']),
+    htmlType: PropTypes.oneOf(['submit', 'button', 'reset']),
+    onClick: PropTypes.func,
+    loading: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
+    className: PropTypes.string,
+    icon: PropTypes.string,
   };
 
   timeout: number;
@@ -85,8 +89,8 @@ export default class Button extends React.Component<ButtonProps, any> {
       clearTimeout(this.delayTimeout);
     }
 
-    if (loading) {
-      this.delayTimeout = setTimeout(() => this.setState({ loading }), 200);
+    if (loading && loading.delay) {
+      this.delayTimeout = setTimeout(() => this.setState({ loading }), loading.delay);
     } else {
       this.setState({ loading });
     }
@@ -115,7 +119,6 @@ export default class Button extends React.Component<ButtonProps, any> {
 
   // Handle auto focus when click button in Chrome
   handleMouseUp = (e) => {
-    (findDOMNode(this) as HTMLElement).blur();
     if (this.props.onMouseUp) {
       this.props.onMouseUp(e);
     }

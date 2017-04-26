@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import classNames from 'classnames';
-import { Icon, Tooltip, message } from 'antd';
+import { Icon, Tooltip } from 'antd';
 import EditButton from './EditButton';
+import BrowserFrame from '../BrowserFrame';
 
 export default class Demo extends React.Component {
   static contextTypes = {
-    intl: React.PropTypes.object,
+    intl: PropTypes.object,
   }
 
   constructor(props) {
@@ -17,6 +19,8 @@ export default class Demo extends React.Component {
     this.state = {
       codeExpand: false,
       sourceCode: '',
+      copied: false,
+      copyTooltipVisible: false,
     };
   }
 
@@ -28,7 +32,9 @@ export default class Demo extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (this.state.codeExpand || this.props.expand) !== (nextState.codeExpand || nextProps.expand);
+    return (this.state.codeExpand || this.props.expand) !== (nextState.codeExpand || nextProps.expand)
+     || this.state.copied !== nextState.copied
+     || this.state.copyTooltipVisible !== nextState.copyTooltipVisible;
   }
 
   componentDidMount() {
@@ -47,6 +53,23 @@ export default class Demo extends React.Component {
     this.anchor = anchor;
   }
 
+  handleCodeCopied = () => {
+    this.setState({ copied: true });
+  }
+
+  onCopyTooltipVisibleChange = (visible) => {
+    if (visible) {
+      this.setState({
+        copyTooltipVisible: visible,
+        copied: false,
+      });
+      return;
+    }
+    this.setState({
+      copyTooltipVisible: visible,
+    });
+  }
+
   render() {
     const state = this.state;
     const props = this.props;
@@ -61,7 +84,9 @@ export default class Demo extends React.Component {
       expand,
     } = props;
     if (!this.liveDemo) {
-      this.liveDemo = meta.iframe ? <iframe src={src} /> : preview(React, ReactDOM);
+      this.liveDemo = meta.iframe
+        ? <BrowserFrame><iframe src={src} height={meta.iframe} /></BrowserFrame>
+        : preview(React, ReactDOM);
     }
     const codeExpand = state.codeExpand || expand;
     const codeBoxClass = classNames({
@@ -105,10 +130,21 @@ export default class Demo extends React.Component {
           <div className="highlight">
             <CopyToClipboard
               text={state.sourceCode}
-              onCopy={() => message.success('Code copied!')}
+              onCopy={this.handleCodeCopied}
             >
-              <Tooltip title={<FormattedMessage id="app.demo.copy" />}>
-                <Icon type="copy" className="code-box-code-copy" />
+              <Tooltip
+                visible={state.copyTooltipVisible}
+                onVisibleChange={this.onCopyTooltipVisibleChange}
+                title={
+                  <FormattedMessage
+                    id={`app.demo.${state.copied ? 'copied' : 'copy'}`}
+                  />
+                }
+              >
+                <Icon
+                  type={(state.copied && state.copyTooltipVisible) ? 'check' : 'copy'}
+                  className="code-box-code-copy"
+                />
               </Tooltip>
             </CopyToClipboard>
             {props.utils.toReactComponent(highlightedCode)}

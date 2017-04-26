@@ -8,26 +8,25 @@
 
 .@{autocomplete-prefix-cls} {
   &.@{select-prefix-cls} {
-
     .@{select-prefix-cls} {
-      &-search--inline {
-        position: relative;
-      }
       &-selection {
         border: 0;
-        &--single {
-          height: auto;
-        }
+        box-shadow: none;
         &__rendered {
           margin-left: 0;
           margin-right: 0;
-          line-height: 0;
         }
         &__placeholder {
           margin-left: 8px;
           margin-right: 8px;
           top: @input-height-base / 2;
         }
+      }
+    }
+
+    &-allow-clear {
+      .@{select-prefix-cls}-selection:hover .@{select-prefix-cls}-selection__rendered {
+        margin-right: 0 !important;
       }
     }
 

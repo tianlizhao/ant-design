@@ -33,6 +33,7 @@ Read [the documentation of `antd-init`](https://github.com/ant-design/antd-init/
 
 > Also, you can use scaffold/demo which is provided by community:
 >
+>   - [antd-admin](https://github.com/zuiidea/antd-admin)
 >   - [reactSPA](https://github.com/JasonBai007/reactSPA)
 >   - [react-redux-antd by Justin-lu](https://github.com/Justin-lu/react-redux-antd)
 >   - [react-redux-antd by okoala](https://github.com/okoala/react-redux-antd)
@@ -160,11 +161,15 @@ There are some [scaffolds](https://github.com/ant-design/ant-design/issues/129) 
 
 ## Import on Demand
 
-If you see a log like below screenshot, you might import all components by writing `import { Button } from 'antd';`, this will affect your app's network perfermance.
+If you see logs like below screenshot, you might import all components by writing `import { Button } from 'antd';`, this will affect your app's network perfermance.
 
-> ![](https://zos.alipayobjects.com/rmsportal/vgcHJRVZFmPjAawwVoXK.png)
+```
+You are using a whole package of antd, please use https://www.npmjs.com/package/babel-plugin-import to reduce app bundle size.
+```
 
-But, we can import individual components on demand:
+> ![](https://zos.alipayobjects.com/rmsportal/GHIRszVcmjccgZRakJDQ.png)
+
+However, we can import individual components on demand:
 
 ```jsx
 import Button from 'antd/lib/button';
