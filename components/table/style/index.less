@@ -39,13 +39,25 @@
     }
 
     .@{iconfont-css-prefix}-filter, .@{table-prefix-cls}-filter-icon {
+      position: relative;
       margin-left: 4px;
       font-size: @font-size-base;
       cursor: pointer;
       color: #aaa;
       transition: all .3s;
+      width: 14px;
+
       &:hover {
         color: @text-color;
+      }
+
+      &:after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 50px;
+        left: 0;
+        top: -19px;
       }
     }
 
@@ -75,7 +87,7 @@
   }
 
   &-footer {
-    padding: 16px 8px;
+    padding: @table-padding-vertical @table-padding-horizontal;
     background: @table-header-bg;
     border-radius: 0 0 @border-radius-base @border-radius-base;
     position: relative;
@@ -95,7 +107,7 @@
   }
 
   &-title {
-    padding: 16px 0;
+    padding: @table-padding-vertical 0;
     position: relative;
     top: 1px;
     border-radius: @border-radius-base @border-radius-base 0 0;
@@ -103,8 +115,8 @@
 
   &.@{table-prefix-cls}-bordered &-title {
     border: @border-width-base @border-style-base @border-color-split;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: @table-padding-horizontal;
+    padding-right: @table-padding-horizontal;
   }
 
   &-title + &-content {
@@ -126,16 +138,16 @@
   }
 
   &-tbody > tr.@{table-prefix-cls}-row-selected {
-    background: #fafafa;
+    background: @table-selected-row-bg;
   }
 
   &-thead > tr > th.@{table-prefix-cls}-column-sort {
-    background: #eaeaea;
+    background: @table-header-sort-bg;
   }
 
   &-thead > tr > th,
   &-tbody > tr > td {
-    padding: 16px 8px;
+    padding: @table-padding-vertical @table-padding-horizontal;
     word-break: break-all;
   }
 
@@ -199,6 +211,26 @@
     .@{table-prefix-cls}-footer {
       padding: 10px 8px;
     }
+
+    .@{table-prefix-cls}-column-sorter-up:after {
+      top: -13px;
+      height: 13px;
+    }
+
+    .@{table-prefix-cls}-column-sorter-down:after {
+      bottom: -11px;
+      height: 13px;
+    }
+
+    .@{table-prefix-cls}-thead > tr > th {
+      .@{iconfont-css-prefix}-filter,
+      .@{table-prefix-cls}-filter-icon {
+        &:after {
+          height: 38px;
+          top: -13px;
+        }
+      }
+    }
   }
 
   &-small {
@@ -242,21 +274,42 @@
     .@{table-prefix-cls}-row:last-child td {
       border-bottom: 0;
     }
+
+    .@{table-prefix-cls}-column-sorter-up:after {
+      top: -14px;
+      height: 13px;
+    }
+
+    .@{table-prefix-cls}-column-sorter-down:after {
+      bottom: -11px;
+      height: 13px;
+    }
+
+    .@{table-prefix-cls}-thead > tr > th {
+      .@{iconfont-css-prefix}-filter,
+      .@{table-prefix-cls}-filter-icon {
+        &:after {
+          height: 39px;
+          top: -14px;
+        }
+      }
+    }
   }
 
   &-column-sorter {
+    position: relative;
     margin-left: 4px;
     display: inline-block;
-    width: 12px;
+    width: 14px;
     height: 14px;
     vertical-align: middle;
     text-align: center;
+
     &-up,
     &-down {
       line-height: 4px;
-      height: 5px;
       display: block;
-      width: 12px;
+      width: 14px;
       cursor: pointer;
       &:hover .@{iconfont-css-prefix} {
         color: @text-color;
@@ -267,10 +320,27 @@
           color: @primary-color;
         }
       }
+
+      &:after {
+        position: absolute;
+        content: '';
+        height: 20px;
+        width: 14px;
+        left: 0;
+      }
     }
+
+    &-up:after {
+      top: -19px;
+    }
+
+    &-down:after {
+      bottom: -17px;
+    }
+
     .@{iconfont-css-prefix}-caret-up,
     .@{iconfont-css-prefix}-caret-down {
-      .iconfont-size-under-12px(7px);
+      .iconfont-size-under-12px(8px);
       line-height: 6px;
       height: 6px;
       color: #aaa;
@@ -361,7 +431,7 @@
 
   &-placeholder {
     position: relative;
-    padding: 16px 8px;
+    padding: @table-padding-vertical @table-padding-horizontal;
     background: @component-background;
     border-bottom: @border-width-base @border-style-base @border-color-split;
     text-align: center;
@@ -424,7 +494,7 @@
 
     &-btns {
       overflow: hidden;
-      padding: 7px 16px;
+      padding: 7px 8px;
       border-top: @border-width-base @border-style-base @border-color-split;
     }
 
@@ -452,6 +522,7 @@
 
     .@{iconfont-css-prefix}-down {
       color: #aaa;
+      transition: all .3s;
     }
 
     &-menu {
@@ -471,8 +542,10 @@
       cursor: pointer;
       padding: 0;
       display: inline-block;
-      vertical-align: middle;
       line-height: 1;
+      &:hover .@{iconfont-css-prefix}-down {
+        color: #666;
+      }
     }
   }
 
@@ -533,7 +606,7 @@
     height: 100%;
   }
 
-  &-fixed-header &-body {
+  &-fixed-header > &-content > &-scroll > &-body {
     position: relative;
     background: @component-background;
   }

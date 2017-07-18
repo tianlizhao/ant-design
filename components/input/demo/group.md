@@ -18,10 +18,33 @@ Input.Group example
 Note: You don't need `Col` to control the width in the `compact` mode.
 
 ````jsx
-import { Input, Col, Select, InputNumber, DatePicker, AutoComplete } from 'antd';
+import { Input, Col, Select, InputNumber, DatePicker, AutoComplete, Cascader } from 'antd';
 const InputGroup = Input.Group;
 const Option = Select.Option;
 
+const options = [{
+  value: 'zhejiang',
+  label: 'Zhejiang',
+  children: [{
+    value: 'hangzhou',
+    label: 'Hangzhou',
+    children: [{
+      value: 'xihu',
+      label: 'West Lake',
+    }],
+  }],
+}, {
+  value: 'jiangsu',
+  label: 'Jiangsu',
+  children: [{
+    value: 'nanjing',
+    label: 'Nanjing',
+    children: [{
+      value: 'zhonghuamen',
+      label: 'Zhong Hua Men',
+    }],
+  }],
+}];
 
 class CompactDemo extends React.Component {
   state = {
@@ -40,10 +63,10 @@ class CompactDemo extends React.Component {
     return (
       <div>
         <InputGroup size="large">
-          <Col span="4">
+          <Col span={4}>
             <Input defaultValue="0571" />
           </Col>
-          <Col span="8">
+          <Col span={8}>
             <Input defaultValue="26888888" />
           </Col>
         </InputGroup>
@@ -107,6 +130,14 @@ class CompactDemo extends React.Component {
             onChange={this.handleChange}
             placeholder="Email"
           />
+        </InputGroup>
+        <br />
+        <InputGroup compact>
+          <Select style={{ width: '30%' }} defaultValue="Home">
+            <Option value="Home">Home</Option>
+            <Option value="Company">Company</Option>
+          </Select>
+          <Cascader style={{ width: '70%' }} options={options} placeholder="Select Address" />
         </InputGroup>
       </div>
     );

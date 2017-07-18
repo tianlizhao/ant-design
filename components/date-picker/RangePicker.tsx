@@ -1,10 +1,10 @@
+/* tslint:disable jsx-no-multiline-js */
 import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import RcDatePicker from 'rc-calendar/lib/Picker';
 import classNames from 'classnames';
-import assign from 'object-assign';
 import Icon from '../icon';
 import { getLocaleCode } from '../_util/getLocale';
 import warning from '../_util/warning';
@@ -31,9 +31,16 @@ function pickerValueAdapter(value?: moment.Moment | moment.Moment[]): moment.Mom
   return [value, value.clone().add(1, 'month')];
 }
 
+function isEmptyArray(arr) {
+  if (Array.isArray(arr)) {
+    return arr.length === 0 || arr.every(i => !i);
+  }
+  return false;
+}
+
 export default class RangePicker extends React.Component<any, any> {
   static contextTypes = {
-      antLocale: PropTypes.object,
+    antLocale: PropTypes.object,
   };
   static defaultProps = {
     prefixCls: 'ant-calendar',
@@ -53,16 +60,23 @@ export default class RangePicker extends React.Component<any, any> {
         'see: http://u.ant.design/date-picker-value',
       );
     }
+    const pickerValue = !value || isEmptyArray(value) ? props.defaultPickerValue : value;
     this.state = {
       value,
+      showDate: pickerValueAdapter(pickerValue || moment()),
       open: props.open,
+      hoverValue: [],
     };
   }
 
   componentWillReceiveProps(nextProps) {
     if ('value' in nextProps) {
+      const state = this.state;
       const value = nextProps.value || [];
-      this.setState({ value, showDate: getShowDateFromValue(value) });
+      this.setState({
+        value,
+        showDate: getShowDateFromValue(value) || state.showDate,
+      });
     }
     if ('open' in nextProps) {
       this.setState({
@@ -77,6 +91,8 @@ export default class RangePicker extends React.Component<any, any> {
     this.setState({ value: [] });
     this.handleChange([]);
   }
+
+  clearHoverValue = () => this.setState({ hoverValue: [] });
 
   handleChange = (value: moment.Moment[]) => {
     const props = this.props;
@@ -100,6 +116,8 @@ export default class RangePicker extends React.Component<any, any> {
 
   handleShowDateChange = showDate => this.setState({ showDate });
 
+  handleHoverChange = hoverValue => this.setState({ hoverValue });
+
   setValue(value) {
     this.handleChange(value);
     if (!this.props.showTime) {
@@ -107,26 +125,40 @@ export default class RangePicker extends React.Component<any, any> {
     }
   }
 
-  renderFooter = () => {
-    const { prefixCls, ranges } = this.props;
-    if (!ranges) {
+  renderFooter = (...args) => {
+    const { prefixCls, ranges, renderExtraFooter } = this.props;
+    if (!ranges && !renderExtraFooter) {
       return null;
     }
-
-    const operations = Object.keys(ranges).map((range) => {
+    const customFooter = renderExtraFooter ? (
+      <div className={`${prefixCls}-footer-extra`} key="extra">
+        {renderExtraFooter(...args)}
+      </div>
+    ) : null;
+    const operations = Object.keys(ranges || {}).map((range) => {
       const value = ranges[range];
-      return <a key={range} onClick={() => this.setValue(value)}>{range}</a>;
+      return (
+        <a
+          key={range}
+          onClick={() => this.setValue(value)}
+          onMouseEnter={() => this.setState({ hoverValue: value })}
+          onMouseLeave={this.clearHoverValue}
+        >
+          {range}
+        </a>
+      );
     });
-    return (
-      <div className={`${prefixCls}-range-quick-selector`}>
+    const rangeNode = (
+      <div className={`${prefixCls}-footer-extra ${prefixCls}-range-quick-selector`} key="range">
         {operations}
       </div>
     );
+    return [rangeNode, customFooter];
   }
 
   render() {
     const { state, props, context } = this;
-    const { value, showDate, open } = state;
+    const { value, showDate, hoverValue, open } = state;
     const localeCode = getLocaleCode(context);
     if (value && localeCode) {
       if (value[0]) {
@@ -138,9 +170,10 @@ export default class RangePicker extends React.Component<any, any> {
     }
 
     const {
-      disabledDate, disabledTime, showTime, showToday,
-      ranges, prefixCls, popupStyle,
-      style, onOk, locale, format,
+      prefixCls, popupStyle, style,
+      disabledDate, disabledTime,
+      showTime, showToday,
+      ranges, onOk, locale, format,
     } = props;
     warning(!('onOK' in props), 'It should be `RangePicker[onOk]`, instead of `onOK`!');
 
@@ -180,8 +213,10 @@ export default class RangePicker extends React.Component<any, any> {
         dateInputPlaceholder={[startPlaceholder, endPlaceholder]}
         locale={locale.lang}
         onOk={onOk}
-        value={showDate || pickerValueAdapter(props.defaultPickerValue) || pickerValueAdapter(moment())}
+        value={showDate}
         onValueChange={this.handleShowDateChange}
+        hoverValue={hoverValue}
+        onHoverChange={this.handleHoverChange}
         showToday={showToday}
       />
     );
@@ -204,7 +239,7 @@ export default class RangePicker extends React.Component<any, any> {
       const start = inputValue[0];
       const end = inputValue[1];
       return (
-        <span className={props.pickerInputClass} disabled={props.disabled}>
+        <span className={props.pickerInputClass}>
           <input
             disabled={props.disabled}
             readOnly
@@ -227,7 +262,13 @@ export default class RangePicker extends React.Component<any, any> {
     };
 
     return (
-      <span className={props.pickerClass} style={assign({}, style, pickerStyle)}>
+      <span
+        className={classNames(props.className, props.pickerClass)}
+        style={{
+          ...style,
+          ...pickerStyle,
+        }}
+      >
         <RcDatePicker
           {...props}
           {...pickerChangeHandler}

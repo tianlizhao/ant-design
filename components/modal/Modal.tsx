@@ -36,6 +36,7 @@ export interface ModalProps {
   maskTransitionName?: string;
   transitionName?: string;
   className?: string;
+  getContainer?: (instance: React.ReactInstance) => HTMLElement;
 }
 
 export interface ModalContext {
@@ -55,6 +56,7 @@ export interface ModalFuncProps {
   okText?: string;
   cancelText?: string;
   iconType?: string;
+  maskClosable?: boolean;
 }
 export type ModalFunc = (props: ModalFuncProps) => {
   destroy: () => void,

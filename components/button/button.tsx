@@ -1,28 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import Icon from '../icon';
 import omit from 'omit.js';
+import Icon from '../icon';
+import Group from './button-group';
 
 const rxTwoCNChar = /^[\u4e00-\u9fa5]{2}$/;
 const isTwoCNChar = rxTwoCNChar.test.bind(rxTwoCNChar);
-function isString(str) {
+function isString(str: any) {
   return typeof str === 'string';
 }
 
 // Insert one space between two chinese characters automatically.
-function insertSpace(child) {
+function insertSpace(child: React.ReactChild, needInserted: boolean) {
   // Check the child if is undefined or null.
   if (child == null) {
     return;
   }
-  if (isString(child.type) && isTwoCNChar(child.props.children)) {
+  const SPACE = needInserted ? ' ' : '';
+  // strictNullChecks oops.
+  if (typeof child !== 'string' && typeof child !== 'number' &&
+    isString(child.type) && isTwoCNChar(child.props.children)) {
     return React.cloneElement(child, {},
-                              child.props.children.split('').join(' '));
+      child.props.children.split('').join(SPACE));
   }
-  if (isString(child)) {
+  if (typeof child === 'string') {
     if (isTwoCNChar(child)) {
-      child = child.split('').join(' ');
+      child = child.split('').join(SPACE);
     }
     return <span>{child}</span>;
   }
@@ -41,6 +45,7 @@ export interface ButtonProps {
   size?: ButtonSize;
   onClick?: React.FormEventHandler<any>;
   onMouseUp?: React.FormEventHandler<any>;
+  onMouseDown?: React.FormEventHandler<any>;
   loading?: boolean | { delay?: number };
   disabled?: boolean;
   style?: React.CSSProperties;
@@ -50,7 +55,7 @@ export interface ButtonProps {
 }
 
 export default class Button extends React.Component<ButtonProps, any> {
-  static Group: any;
+  static Group: typeof Group;
   static __ANT_BUTTON = true;
 
   static defaultProps = {
@@ -74,14 +79,14 @@ export default class Button extends React.Component<ButtonProps, any> {
   timeout: number;
   delayTimeout: number;
 
-  constructor(props) {
+  constructor(props: ButtonProps) {
     super(props);
     this.state = {
       loading: props.loading,
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: ButtonProps) {
     const currentLoading = this.props.loading;
     const loading = nextProps.loading;
 
@@ -89,7 +94,7 @@ export default class Button extends React.Component<ButtonProps, any> {
       clearTimeout(this.delayTimeout);
     }
 
-    if (loading && loading.delay) {
+    if (typeof loading !== 'boolean' && loading && loading.delay) {
       this.delayTimeout = setTimeout(() => this.setState({ loading }), loading.delay);
     } else {
       this.setState({ loading });
@@ -105,7 +110,7 @@ export default class Button extends React.Component<ButtonProps, any> {
     }
   }
 
-  handleClick = (e) => {
+  handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     // Add click effect
     this.setState({ clicked: true });
     clearTimeout(this.timeout);
@@ -118,7 +123,7 @@ export default class Button extends React.Component<ButtonProps, any> {
   }
 
   // Handle auto focus when click button in Chrome
-  handleMouseUp = (e) => {
+  handleMouseUp = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (this.props.onMouseUp) {
       this.props.onMouseUp(e);
     }
@@ -130,26 +135,34 @@ export default class Button extends React.Component<ButtonProps, any> {
     } = this.props;
 
     const { loading, clicked } = this.state;
+
     // large => lg
     // small => sm
-    const sizeCls = ({
-      large: 'lg',
-      small: 'sm',
-    })[size] || '';
+    let sizeCls = '';
+    switch (size) {
+      case 'large':
+        sizeCls = 'lg';
+        break;
+      case 'small':
+        sizeCls = 'sm';
+      default:
+        break;
+    }
 
-    const classes = classNames(prefixCls, {
+    const classes = classNames(prefixCls, className, {
       [`${prefixCls}-${type}`]: type,
       [`${prefixCls}-${shape}`]: shape,
       [`${prefixCls}-${sizeCls}`]: sizeCls,
-      [`${prefixCls}-icon-only`]: !children && icon,
+      [`${prefixCls}-icon-only`]: !children && icon && !loading,
       [`${prefixCls}-loading`]: loading,
       [`${prefixCls}-clicked`]: clicked,
       [`${prefixCls}-background-ghost`]: ghost,
-    }, className);
+    });
 
     const iconType = loading ? 'loading' : icon;
     const iconNode = iconType ? <Icon type={iconType} /> : null;
-    const kids = React.Children.map(children, insertSpace);
+    const needInserted = React.Children.count(children) === 1 && !iconType;
+    const kids = React.Children.map(children, child => insertSpace(child, needInserted));
 
     return (
       <button

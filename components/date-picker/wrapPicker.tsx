@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TimePickerPanel from 'rc-time-picker/lib/Panel';
 import classNames from 'classnames';
+import { generateShowHourMinuteSecond } from '../time-picker';
 import warning from '../_util/warning';
 import { getComponentLocale } from '../_util/getLocale';
 declare const require: Function;
 
-function getColumns({ showHour, showMinute, showSecond }) {
+function getColumns({ showHour, showMinute, showSecond, use12Hours }) {
   let column = 0;
   if (showHour) {
     column += 1;
@@ -15,6 +16,9 @@ function getColumns({ showHour, showMinute, showSecond }) {
     column += 1;
   }
   if (showSecond) {
+    column += 1;
+  }
+  if (use12Hours) {
     column += 1;
   }
   return column;
@@ -37,9 +41,6 @@ export default function wrapPicker(Picker, defaultFormat?: string): any {
       onOpenChange() {
       },
       locale: {},
-      align: {
-        offset: [0, -9],
-      },
       prefixCls: 'ant-calendar',
       inputPrefixCls: 'ant-input',
     };
@@ -64,11 +65,10 @@ export default function wrapPicker(Picker, defaultFormat?: string): any {
       const pickerClass = classNames({
         [`${prefixCls}-picker`]: true,
       });
-      const pickerInputClass = classNames({
-        [`${prefixCls}-picker-input`]: true,
-        [inputPrefixCls]: true,
+      const pickerInputClass = classNames(`${prefixCls}-picker-input`, inputPrefixCls, {
         [`${inputPrefixCls}-lg`]: props.size === 'large',
         [`${inputPrefixCls}-sm`]: props.size === 'small',
+        [`${inputPrefixCls}-disabled`]: props.disabled,
       });
 
       const locale = getComponentLocale(
@@ -78,16 +78,12 @@ export default function wrapPicker(Picker, defaultFormat?: string): any {
 
       const timeFormat = (props.showTime && props.showTime.format) || 'HH:mm:ss';
       const rcTimePickerProps = {
+        ...generateShowHourMinuteSecond(timeFormat),
         format: timeFormat,
-        showSecond: timeFormat.indexOf('ss') >= 0,
-        showMinute: timeFormat.indexOf('mm') >= 0,
-        showHour: timeFormat.indexOf('HH') >= 0,
+        use12Hours: (props.showTime && props.showTime.use12Hours),
       };
       const columns = getColumns(rcTimePickerProps);
-      const timePickerCls = classNames({
-        [`${prefixCls}-time-picker-1-column`]: columns === 1,
-        [`${prefixCls}-time-picker-2-columns`]: columns === 2,
-      });
+      const timePickerCls = `${prefixCls}-time-picker-column-${columns}`;
       const timePicker = props.showTime ? (
         <TimePickerPanel
           {...rcTimePickerProps}
